@@ -11,6 +11,7 @@ export default function StoreDetail() {
   return (
     <>
       <section className="card">
+        <title>{`${store.name} · TrustTab`}</title>
         <h2>{store.name}</h2>
         <p className="muted">{store.category}</p>
         <h3>메뉴</h3>

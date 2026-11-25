@@ -1,0 +1,5 @@
+# Windows 에서 더블클릭 · PowerShell 로 실행하는 파일은 줄 끝을 CRLF 로 고정
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.ico binary
+*.png binary

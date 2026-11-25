@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { Wallet, getBytes, verifyMessage } from "ethers";
 import { BadRequest, judge } from "./judge.mjs";
 import { verdictDigest } from "./sign.mjs";
+import { isAllowedOrigin } from "./origins.mjs";
 
 const wallet = Wallet.createRandom();
 const config = { chainId: 11155111, contract: "0x00000000000000000000000000000000000000AA" };
@@ -42,4 +43,21 @@ test("O4 잘못된 요청은 BadRequest", async () => {
     { paymentId: 1, reviewer, rating: 5, content: "가".repeat(301) },
   ];
   for (const body of bad) await assert.rejects(judge(wallet, config, body), BadRequest);
+});
+
+test("O5 (11단계) 허락한 화면 주소만 오라클을 부를 수 있다", () => {
+  for (const ok of ["http://trusttab.localhost:5173", "http://localhost:5173", "https://whd5753-sudo.github.io"]) {
+    assert.equal(isAllowedOrigin(ok), true, ok);
+  }
+  for (const bad of [
+    "https://evil.example",
+    "http://trusttab.localhost:5174", // 다른 포트
+    "http://trusttab.localhost.evil.com:5173", // 앞부분만 같은 가짜
+    "https://whd5753-sudo.github.io.evil.com",
+    "https://other.github.io", // 다른 계정의 Pages
+    "null",
+    undefined,
+  ]) {
+    assert.equal(isAllowedOrigin(bad), false, String(bad));
+  }
 });

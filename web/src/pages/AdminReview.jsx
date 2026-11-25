@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router";
 import { fetchAdmin, fetchHeldReviews, sendResolveHeld } from "../contracts/client.js";
 import { toKoreanError } from "../contracts/errors.js";
 import { txUrl } from "../contracts/fairReview.js";
@@ -52,8 +53,13 @@ export default function AdminReview() {
 
   return (
     <section className="card" aria-labelledby="admin-title">
+      <title>보류 리뷰 검토 · TrustTab</title>
+      <meta name="robots" content="noindex" />
       <h2 id="admin-title">보류 리뷰 검토 (관리자)</h2>
       <p className="muted small">AI 점수 400~699 리뷰는 바로 게시되지 않고 여기서 관리자가 승인 · 거절합니다.</p>
+      <p className="small">
+        <Link to="/admin/ops">운영 설정: 가게 등록 · 긴급 정지 →</Link>
+      </p>
 
       {state.status === "loading" && <p className="muted">블록체인에서 보류 리뷰를 불러오는 중…</p>}
       {state.status === "error" && (

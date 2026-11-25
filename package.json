@@ -1,0 +1,17 @@
+{
+  "name": "trusttab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TrustTab (구 FairReview) — 실행기. 의존성 없음 (web · oracle · contracts 는 각 폴더에 따로 설치)",
+  "type": "module",
+  "scripts": {
+    "start": "node start.mjs",
+    "dev": "node start.mjs --dev",
+    "oracle": "node start.mjs --oracle-only --no-open",
+    "test": "node --test start.test.mjs && npm test --prefix oracle && npm test --prefix web",
+    "test:launcher": "node --test start.test.mjs"
+  },
+  "engines": {
+    "node": ">=20.12"
+  }
+}

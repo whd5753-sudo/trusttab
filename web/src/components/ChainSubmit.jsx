@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router";
 import { fetchPayment, requestVerdict, sendReview } from "../contracts/client.js";
 import { toKoreanError } from "../contracts/errors.js";
 import { txUrl } from "../contracts/fairReview.js";
@@ -9,7 +10,12 @@ import { getProvider, useWallet } from "../state/WalletContext.jsx";
 // 게시(400 미만) = 바로 게시 + 10포인트, 보류(400~699) = 관리자 검토 후 게시, 거부(700 이상) = 기록 불가
 export default function ChainSubmit({ store, rating, content, verdict }) {
   const { account, isSepolia, switchToSepolia, refreshPoints } = useWallet();
-  const [paymentId, setPaymentId] = useState("");
+  // 11단계: 사장님이 준 리뷰 링크(…/review?payment=7)로 들어오면 결제 번호를 미리 채운다
+  const [params] = useSearchParams();
+  const [paymentId, setPaymentId] = useState(() => {
+    const fromLink = params.get("payment");
+    return fromLink && /^[1-9]\d{0,9}$/.test(fromLink) ? fromLink : "";
+  });
   const [status, setStatus] = useState("idle"); // idle · checking · oracle · signing · mining · done · error
   const [message, setMessage] = useState("");
   const [txHash, setTxHash] = useState(null);

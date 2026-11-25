@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 import { analyzeText, decide } from "../ai/engine.js";
 import { getStore } from "../data/stores.js";
 import ReviewForm from "../components/ReviewForm.jsx";
@@ -17,6 +17,9 @@ export default function WriteReview() {
 }
 
 function ReviewChecker({ store }) {
+  const [params] = useSearchParams();
+  const linked = params.get("payment");
+  const paymentFromLink = linked && /^[1-9]\d{0,9}$/.test(linked) ? linked : null;
   const [content, setContent] = useState("");
   const [rating, setRating] = useState(5);
   const [result, setResult] = useState(null);
@@ -44,9 +47,16 @@ function ReviewChecker({ store }) {
 
   return (
     <>
+      <title>{`${store.name} 리뷰 쓰기 · TrustTab`}</title>
       <div className="store-heading">
         <h2 className="page-title">{store.name}</h2>
         <Link to={`/stores/${store.id}`}>가게로 돌아가기</Link>
+        {/* 11단계: 사장님이 준 리뷰 링크로 들어온 경우 */}
+        {paymentFromLink && (
+          <p className="link-hint">
+            결제 {paymentFromLink}번 리뷰 링크로 들어왔습니다. 리뷰를 쓰고 검사하면 제출 칸에 결제 번호가 미리 채워집니다.
+          </p>
+        )}
       </div>
       <ReviewForm
         content={content}

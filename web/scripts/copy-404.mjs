@@ -1,5 +1,5 @@
 // GitHub Pages 새로고침 404 대책: 빌드 후 dist/index.html 을 dist/404.html 로 복사한다.
-// Pages 는 없는 주소(/fairreview-dapp/stores/2)에 404.html 을 주므로, 그 안의 React 앱이 주소를 보고 화면을 그린다.
+// Pages 는 없는 주소(/trusttab/stores/2)에 404.html 을 주므로, 그 안의 React 앱이 주소를 보고 화면을 그린다.
 import { copyFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 

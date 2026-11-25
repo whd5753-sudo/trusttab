@@ -5,7 +5,7 @@ import App from "./App.jsx";
 import { WalletProvider } from "./state/WalletContext.jsx";
 import "./App.css";
 
-// basename 은 vite.config.js 의 base("/fairreview-dapp/")에서 끝의 / 만 뗀 값
+// basename 은 vite.config.js 의 base 에서 끝의 / 만 뗀 값 (내 컴퓨터 "", Pages "/trusttab")
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "")}>

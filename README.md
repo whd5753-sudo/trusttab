@@ -1,12 +1,14 @@
-# FairReview
+# TrustTab (구 FairReview)
 
-FairReview는 소상공인을 허위 리뷰로부터 보호하고 단골 고객에게 웹3 기반 로열티를 제공하는 탈중앙화 애플리케이션(dApp)입니다. 실제로 결제한 손님만 리뷰를 작성할 수 있으며, 작성된 리뷰는 AI가 신뢰도 점수를 판정하고 그 결과에 대한 서명을 스마트 컨트랙트가 온체인에서 검증해 조작을 막습니다. 검증된 리뷰를 남기고 꾸준히 방문하는 단골에게는 다른 사람에게 양도할 수 없는 포인트를 지급해, 포인트 거래나 리뷰 매수 없이 진짜 고객 관계만이 보상받는 구조를 만듭니다.
+TrustTab(프로젝트 시작 때 이름 FairReview)은 소상공인을 허위 리뷰로부터 보호하고 단골 고객에게 웹3 기반 로열티를 제공하는 탈중앙화 애플리케이션(dApp)입니다. 실제로 결제한 손님만 리뷰를 작성할 수 있으며, 작성된 리뷰는 AI가 신뢰도 점수를 판정하고 그 결과에 대한 서명을 스마트 컨트랙트가 온체인에서 검증해 조작을 막습니다. 검증된 리뷰를 남기고 꾸준히 방문하는 단골에게는 다른 사람에게 양도할 수 없는 포인트를 지급해, 포인트 거래나 리뷰 매수 없이 진짜 고객 관계만이 보상받는 구조를 만듭니다.
 
 건양대학교 스마트보안학과 「Web3.0 개념과 개발」 프로젝트 #36 · Sepolia 테스트넷 전용 (메인넷 · 실제 자산 없음)
 
 | | |
 |---|---|
-| 화면 (GitHub Pages) | https://whd5753-sudo.github.io/fairreview-dapp/ |
+| 화면 (GitHub Pages) | https://whd5753-sudo.github.io/trusttab/ (저장소 이름을 `trusttab` 으로 바꾼 뒤. 바꾸기 전에는 `/fairreview-dapp/`) |
+| 내 컴퓨터 | http://trusttab.localhost:5173/ (`npm run dev` 또는 `TrustTab-dev.cmd`) |
+| 실행 · 운영 | [운영가이드](docs/운영가이드.md) · 상용화 기능 [상용화](docs/상용화.md) |
 | 컨트랙트 (Sepolia, v2) | [`0x8773d97845c5a58EfDDD8Dde9499Cde4E4eeED0D`](https://sepolia.etherscan.io/address/0x8773d97845c5a58EfDDD8Dde9499Cde4E4eeED0D) |
 | AI 오라클 주소 | `0x37eefe78D2e742208bfe1a1f688B2b385D7E5A28` (서명만 하는 테스트 지갑) |
 
@@ -15,6 +17,7 @@ FairReview는 소상공인을 허위 리뷰로부터 보호하고 단골 고객�
 - **결제한 손님만 리뷰** — 사장님이 결제를 기록한 손님 지갑만, 결제 한 건에 한 번, 30일 안에 쓸 수 있다
 - **AI 판정을 컨트랙트가 믿게** — 체인 밖 AI 오라클이 점수에 서명하고, 컨트랙트는 서명을 확인한다. 400 미만 게시 · 400~699 보류(관리자 검토) · 700 이상 거부
 - **넘길 수 없는 포인트** — 결제 1% + 리뷰 10포인트. 보내기 함수가 없어 사고팔 수 없고, 리뷰 보상은 별점과 상관없이 같다
+- **일반 사이트처럼** — 다시 방문하면 지갑 자동 연결 · Sepolia 자동 전환, 사장님 결제 기록 화면(Remix 없이) + 리뷰 링크, 탭 제목 · 공유 미리보기 · 앱 설치 · 약관 · 보안 정책(CSP)
 
 ## 구조
 
@@ -22,8 +25,8 @@ FairReview는 소상공인을 허위 리뷰로부터 보호하고 단골 고객�
 flowchart LR
   C[손님 브라우저<br/>React · GitHub Pages] -- "① 리뷰 · 결제 번호" --> O[AI 오라클 서버<br/>oracle/ · 4단계 엔진]
   O -- "② 점수 + 오라클 서명" --> C
-  C -- "③ submitReview(…, 점수, 서명)<br/>MetaMask 서명" --> K[FairReview 컨트랙트<br/>Sepolia]
-  S[사장님 지갑] -- "recordPayment" --> K
+  C -- "③ submitReview(…, 점수, 서명)<br/>MetaMask 서명" --> K[FairReview 컨트랙트<br/>Sepolia · 이름은 그대로]
+  S[사장님 화면 /owner] -- "recordPayment" --> K
   A[관리자 지갑] -- "registerStore · resolveHeld" --> K
   C -- "읽기: 포인트 · 리뷰 이벤트<br/>공개 노드" --> K
 ```
@@ -34,33 +37,39 @@ flowchart LR
 
 | 폴더 | 내용 | 테스트 |
 |---|---|---|
-| `web/` | React 19 + Vite · 라우팅 · 지갑 Context · AI 엔진(`src/ai/engine.js`) · 체인 연결(`src/contracts/`) | Vitest **50** (기대값 표 · 화면 · 체인 mock) |
+| `web/` | React 19 + Vite · 라우팅 · 지갑 Context · AI 엔진(`src/ai/engine.js`) · 체인 연결(`src/contracts/`) · 사장님 · 관리자 운영 화면 · 약관 | Vitest **71** (기대값 표 · 화면 · 체인 mock · 사이트 기능) |
 | `contracts/` | Solidity 0.8.24 `FairReview.sol` · Hardhat 2 · OpenZeppelin ECDSA | Hardhat **39** · 뮤테이션 **16/16** |
-| `oracle/` | AI 오라클 서버 (`POST /sign`) · 키 생성 · 서명 형식 | node:test **4** |
-| `docs/` | 단계별 설계 문서 (정답지) · 보안 점검 · Slither 보고서 | — |
+| `oracle/` | AI 오라클 서버 (`POST /sign`) · 키 생성 · 서명 형식 · 허락 주소(`origins.mjs`) | node:test **5** |
+| `docs/` | 단계별 설계 문서 (정답지) · 보안 점검 · Slither 보고서 · 운영가이드 · 상용화 | — |
+| `start.mjs` · `TrustTab.cmd` · `scripts/` | 실행기 (오라클 + 사이트 한 번에) · 더블클릭 · `trusttab` 명령 · 바탕화면 아이콘 · 자동 실행 설치/삭제 | node:test **4** |
 | `.claude/` | Claude Code 하네스: 규칙 · 스킬 · 보안 검토 서브에이전트 · 권한 · 검사 훅 | 훅이 매 수정마다 전체 테스트 |
 | `.github/workflows/` | CI (check · web · contracts · oracle) · Pages 배포 (테스트 통과해야 배포) | — |
 
 ## 실행
 
+**평소 · 시연**: `TrustTab.cmd` 더블클릭 또는 `npm start` (설치하면 어디서나 `trusttab`) — AI 오라클을 켜고 사이트를 Edge 로 연다.
+**화면 고칠 때**: `TrustTab-dev.cmd` 또는 `npm run dev`. 자세한 설명 · 문제 해결은 [운영가이드](docs/운영가이드.md).
+
+처음 설치 · 폴더별 명령:
+
 ```bash
 # AI 오라클 (리뷰 제출에 필요)
 cd oracle && npm install && npm test
 npm run keygen          # oracle/.env 생성 (처음 한 번, 개인키는 화면에 안 나옴)
-npm start               # http://localhost:8787 — ORACLE_CONTRACT 를 .env 에 적은 뒤
+npm start               # http://localhost:8787 (컨트랙트 주소는 config.json)
 
 # 컨트랙트 (oracle 설치 뒤)
 cd contracts && npm install && npx hardhat test && npm run mutation
 
 # 화면
-cd web && npm install && npm test && npm run dev   # http://localhost:5173/fairreview-dapp/
+cd web && npm install && npm test && npm run dev   # http://trusttab.localhost:5173/
 ```
 
 ## 검증
 
 | 항목 | 결과 | 자세히 |
 |---|---|---|
-| 테스트 | web 50 · contracts 39 · oracle 4, CI 4개 작업 | [테스트설계](docs/테스트설계.md) · [기대값표](docs/기대값표.md) |
+| 테스트 | web 71 · contracts 39 · oracle 5 · 실행기 4, CI 4개 작업 | [테스트설계](docs/테스트설계.md) · [기대값표](docs/기대값표.md) |
 | 뮤테이션 | 안전 검사 16줄을 하나씩 지워도 **16/16** 테스트가 잡음 | [보안점검 4절](docs/보안점검.md) |
 | 정적 분석 | Slither 3건 (모두 의도된 것, 설명 있음) | [slither-report-10](docs/slither-report-10.txt) |
 | 실제 체인 | Sepolia 배포 · 가게 3 · 결제 2 · 리뷰 제출 · 배포된 컨트랙트의 서명 해시 = 오라클 서명 해시 | [오라클설계 9절](docs/오라클설계.md) |
@@ -84,7 +93,7 @@ cd web && npm install && npm test && npm run dev   # http://localhost:5173/fairr
 | 8 | Hardhat 테스트 · Sepolia 배포 · 화면 연결 | [테스트설계](docs/테스트설계.md) · [화면연결설계](docs/화면연결설계.md) |
 | 9 | 보안 점검 · 뮤테이션 · Slither | [보안점검](docs/보안점검.md) |
 | 10 | AI 오라클 서명 검증 · 보류 리뷰 관리자 검토 | [오라클설계](docs/오라클설계.md) |
-| 11 | 정리 · 회고 · 발표 | [회고](docs/회고.md) · [발표준비](docs/발표준비.md) |
+| 11 | 정리 · 회고 · 발표 · 디자인(다크 글래스) · 이름 TrustTab · 일반 사이트 기능 | [회고](docs/회고.md) · [발표준비](docs/발표준비.md) · [화면설계 6절](docs/화면설계.md) |
 
 ## AI 사용
 

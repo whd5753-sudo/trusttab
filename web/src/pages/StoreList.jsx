@@ -4,6 +4,7 @@ import { STORES } from "../data/stores.js";
 export default function StoreList() {
   return (
     <section>
+      <title>가게 목록 · TrustTab</title>
       <h2 className="page-title">가게 목록</h2>
       <ul className="store-list">
         {STORES.map((store) => (

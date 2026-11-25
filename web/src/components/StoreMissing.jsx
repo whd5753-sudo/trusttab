@@ -4,6 +4,7 @@ import { Link } from "react-router";
 export default function StoreMissing() {
   return (
     <section className="card">
+      <title>없는 가게 · TrustTab</title>
       <h2>없는 가게입니다</h2>
       <p>주소의 가게 번호를 확인해 주세요.</p>
       <Link to="/stores">가게 목록으로</Link>

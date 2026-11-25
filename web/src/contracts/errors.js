@@ -21,6 +21,17 @@ export const ERROR_MESSAGES = {
   SuspectedFakeReview: "AI 판정 거부: 광고 · 과장 리뷰로 보여 블록체인에 기록할 수 없습니다",
   NotHeld: "이미 검토가 끝난 리뷰입니다",
   NotAdmin: "관리자만 할 수 있습니다",
+  // 11단계: 사장님 결제 기록
+  StoreNotFound: "없는 가게입니다",
+  NotStoreOwner: "이 가게 사장님 지갑이 아닙니다",
+  ZeroAddress: "손님 지갑 주소가 비어 있습니다",
+  InvalidAmount: "결제 금액은 1원 이상 1,000만 원 이하여야 합니다",
+  SelfPayment: "사장님 본인 지갑으로는 결제를 기록할 수 없습니다 (셀프 리뷰 방지)",
+  InvalidAddress: "손님 지갑 주소 형식이 올바르지 않습니다 (0x 로 시작하는 42글자)",
+  // 11단계: 관리자 운영
+  EmptyName: "가게 이름이 비어 있습니다",
+  InvalidOwnerAddress: "사장님 지갑 주소 형식이 올바르지 않습니다 (0x 로 시작하는 42글자)",
+  NameTooLong: "가게 이름은 40자까지 쓸 수 있습니다",
 };
 const FALLBACK = "블록체인 요청이 실패했습니다. 잠시 후 다시 시도해 주세요";
 

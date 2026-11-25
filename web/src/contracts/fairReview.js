@@ -17,15 +17,31 @@ export const FAIR_REVIEW_ABI = [
   "function oracle() view returns (address)",
   "function points(address user) view returns (uint256)",
   "function stores(uint256 storeId) view returns (address owner, string name)",
+  "function storeCount() view returns (uint256)",
+  "function paused() view returns (bool)",
   "function payments(uint256 paymentId) view returns (uint256 storeId, address customer, uint256 amount, uint64 paidAt, bool reviewed)",
   "function reviewStatus(uint256 paymentId) view returns (uint8)",
   "function submitReview(uint256 paymentId, uint8 rating, string content, uint16 score, bytes signature)",
   "function resolveHeld(uint256 paymentId, bool approve)",
+  // 11단계: 사장님 화면(/owner)에서 결제 기록 — Remix 없이 앱에서
+  "function recordPayment(uint256 storeId, address customer, uint256 amount) returns (uint256 paymentId)",
+  // 11단계: 관리자 운영 화면(/admin/ops) — 가게 등록 · 긴급 정지 (Remix 대신)
+  "function registerStore(address owner, string name) returns (uint256 storeId)",
+  "function pause()",
+  "function unpause()",
+  "event StoreRegistered(uint256 indexed storeId, address indexed owner, string name)",
+  "event PaymentRecorded(uint256 indexed paymentId, uint256 indexed storeId, address indexed customer, uint256 amount, uint256 pointsEarned)",
   "event ReviewSubmitted(uint256 indexed paymentId, uint256 indexed storeId, address indexed reviewer, uint8 rating, string content, uint16 aiScore)",
   "event ReviewHeld(uint256 indexed paymentId, uint256 indexed storeId, address indexed reviewer, uint8 rating, string content, uint16 aiScore)",
   "event HeldReviewResolved(uint256 indexed paymentId, uint256 indexed storeId, bool approved)",
   "error NotAdmin()",
   "error ContractPaused()",
+  "error StoreNotFound(uint256 storeId)",
+  "error NotStoreOwner(uint256 storeId)",
+  "error ZeroAddress()",
+  "error EmptyName()",
+  "error InvalidAmount()",
+  "error SelfPayment()",
   "error PaymentNotFound(uint256 paymentId)",
   "error NotPaymentCustomer(uint256 paymentId)",
   "error AlreadyReviewed(uint256 paymentId)",
@@ -38,6 +54,10 @@ export const FAIR_REVIEW_ABI = [
   "error SuspectedFakeReview(uint16 score)",
   "error NotHeld(uint256 paymentId)",
 ];
+
+// 컨트랙트의 한 번 결제 최대 금액 (FairReview.sol 의 MAX_AMOUNT) · 결제 적립률 1%
+export const MAX_AMOUNT = 10_000_000;
+export const POINT_RATE_PERCENT = 1;
 
 export const txUrl = (hash) => `${EXPLORER}/tx/${hash}`;
 export const addressUrl = (address) => `${EXPLORER}/address/${address}`;
